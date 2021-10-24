@@ -1,0 +1,10 @@
+---
+# galaxy installs
+# ansible-galaxy install -r requirements.yml
+
+roles:
+- name: geerlingguy.docker
+
+collections:
+- name: community.docker
+

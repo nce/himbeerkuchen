@@ -1,0 +1,35 @@
+---
+- hosts: raspberry
+  become: true
+  vars_files:
+    - vars.yml
+    - passwords.yml
+  tasks:
+    - name: Update password
+      user:
+        name: "{{ os_user }}"
+        password: "{{ os_user_password | password_hash('sha512', '0aioxcjlk2') }}"
+
+    - name: Update system
+      apt:
+        update_cache: true
+        upgrade: true
+        autoclean: true
+        autoremove: true
+
+    - name: Check if we need to reboot
+      stat:
+        path: /var/run/reboot-required
+      register: p
+
+    - name: Reboot after upgrade
+      reboot:
+        reboot_timeout: 180
+      when: p.stat.exists
+
+    - name: Install default packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ default_packages }}"
+

@@ -1,0 +1,16 @@
+---
+# default vars file
+
+default_packages:
+  - vim
+  - python3
+  - python3-pip
+
+# os
+os_user: pi
+oss_ssh_key_location: ~/.ssh/id_ed25519.pub
+
+# docker
+pihole_dir: /home/{{ os_user }}/pihole
+
+

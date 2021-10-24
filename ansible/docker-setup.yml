@@ -1,0 +1,43 @@
+---
+- hosts: raspberry
+  become: true
+  vars_files:
+    - vars.yml
+    - passwords.yml
+  vars:
+    # docker setup
+    docker_apt_arch: armhf
+    docker_service_state: started
+    docker_service_enabled: true
+    docker_restart_handler_state: restarted
+    docker_install_compose: false
+    docker_users:
+      - "{{ os_user }}"
+  roles:
+    - name: geerlingguy.docker
+
+  tasks:
+    - name: Install Docker compose
+      pip:
+        name: "{{ item }}"
+        executable: pip3
+      loop:
+        - docker-compose
+
+    - name: Create docker-compose setup
+      file:
+        state: directory
+        dest: "{{ pihole_dir }}"
+        owner: "{{ os_user }}"
+
+    - name: Pihole Setup
+      template:
+        dest: "{{ pihole_dir }}/docker-compose.yml"
+        src: templates/docker-pihole.yml.j2
+        owner: "{{ os_user }}"
+
+    - name: Start Compose Setup
+      community.docker.docker_compose:
+        project_src: "{{ pihole_dir }}"
+        project_name: pihole
+
